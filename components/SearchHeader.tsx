@@ -1,11 +1,14 @@
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Platform } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Platform, Image } from 'react-native'
 import React from 'react'
 import Colors from '@/constants/Colors';
 import { Link } from 'expo-router';
 import { Ionicons, Octicons } from '@expo/vector-icons';
 import { defaultStyles } from '@/constants/Styles';
+import { useUserStateContext } from '@/contexts/UserContextProvider';
 
 const SearchHeader = () => {
+  const { user } = useUserStateContext()
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff'}}>
       <View style={styles.container}>
@@ -23,7 +26,15 @@ const SearchHeader = () => {
           </Link>
           <Link href={'/(tabs)/account'} asChild>
             <TouchableOpacity style={styles.filterBtn} activeOpacity={0.6}>
-              <Octicons name="person" size={30} color='#ccc' style={{width: 42, height: 42, textAlign: 'center', lineHeight: 42}} />
+              {
+                !user && 
+                <Octicons name="person" size={30} color='#ccc' style={{width: 46, height: 46, textAlign: 'center', lineHeight: 46}} />
+              }
+              {
+                user &&
+                // @ts-ignore
+                <Image source={{uri: user.avatar}} style={{width: 46, height: 46}} />
+              }
             </TouchableOpacity>
           </Link>
         </View>
@@ -51,7 +62,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
+    paddingHorizontal: 18,
     paddingBottom: 8,
   },
 
@@ -76,12 +87,13 @@ const styles = StyleSheet.create({
     },
   },
   filterBtn: {
+    overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#A2A0A2',
     borderRadius: 100,
     backgroundColor: '#cccccc30',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   }
 });
 

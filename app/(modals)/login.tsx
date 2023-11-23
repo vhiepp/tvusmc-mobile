@@ -14,6 +14,9 @@ import {
   useAutoDiscovery,
 } from 'expo-auth-session'
 import { jwtDecode } from 'jwt-decode'
+import { axiosClient } from '@/api'
+import useRedirectLogin from '@/hooks/useRedirectLogin'
+import { useUserStateContext } from '@/contexts/UserContextProvider'
 
 enum Strategy {
   Google = 'oauth_google'
@@ -23,6 +26,8 @@ WebBrowser.maybeCompleteAuthSession();
 
 const Page = () => {
   const router = useRouter()
+  const {setUserInfo} = useUserStateContext()
+  const {callback} = useRedirectLogin()
   
   useWarmUpBrowser()
 
@@ -79,11 +84,18 @@ const Page = () => {
           discovery,
         ).then((res) => {
 
-          const {email}: {email: string} = jwtDecode(res.idToken!)
+          const user: {email: string, oid: string, name: string} = jwtDecode(res.idToken!)
 
-          const user: {family_name: string} = jwtDecode(res.accessToken!);
-          console.log(user);
-          
+          axiosClient.post('/auth/login/microsoft', {
+            email: user.email,
+            provider_id: user.oid,
+            fullname: user.name,
+            provider: 'microsoft'
+          }).then((response) => {
+            // @ts-ignore
+            setUserInfo(response.data)
+            router.push('/oauth-native-callback')
+          })
         });
       }
     });

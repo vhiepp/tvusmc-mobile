@@ -1,6 +1,6 @@
 import { SignedIn, SignedOut, useAuth, useUser } from '@clerk/clerk-expo'
 import useRedirectLogin from '@/hooks/useRedirectLogin'
-import { Text, ScrollView, Dimensions, Share, StyleSheet, View, TouchableOpacity, Image } from 'react-native'
+import { Text, ScrollView, Dimensions, Share, StyleSheet, View, TouchableOpacity, Image, Button } from 'react-native'
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { useNavigation, useRouter } from 'expo-router'
 import Animated, { SlideInDown, interpolate, useAnimatedRef, useAnimatedStyle, useScrollViewOffset } from 'react-native-reanimated';
@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { defaultStyles } from '@/constants/Styles'
 import * as ImagePicker from 'expo-image-picker';
 import * as SecureStore from 'expo-secure-store';
+import { useUserStateContext } from '@/contexts/UserContextProvider'
 
 const { width } = Dimensions.get('window');
 const IMG_HEIGHT = 280;
@@ -16,13 +17,13 @@ const IMG_HEIGHT = 280;
 const Page = () => {
   const { redirectToLogin } = useRedirectLogin()
   const router = useRouter()
-  const { user } = useUser()
+  const { user, removeUserInfo } = useUserStateContext()
   const navigation = useNavigation()
   const scrollRef = useAnimatedRef<Animated.ScrollView>()
   const [userThumbnailUrl, setUserThumbnailUrl] = useState<string | null>(null)
-
+  
   useEffect(() => {
-    SecureStore.getItemAsync('user_thumbnail_uri').then(res => {
+    SecureStore.getItemAsync(process.env.EXPO_PUBLIC_KEY_STORE_USER_THUMBNAIL!).then(res => {
       setUserThumbnailUrl(res || 'https://mega.com.vn/media/news/2006_hinh-nen-sky-galaxy-laptop66.jpg')
     })
   }, [])
@@ -78,7 +79,7 @@ const Page = () => {
       base64: false,
     });
     if (!result.canceled) {
-      SecureStore.setItemAsync('user_thumbnail_uri', result.assets[0].uri)
+      SecureStore.setItemAsync(process.env.EXPO_PUBLIC_KEY_STORE_USER_THUMBNAIL!, result.assets[0].uri)
       setUserThumbnailUrl(result.assets[0].uri)
     }
     
@@ -87,6 +88,10 @@ const Page = () => {
   const handleOnPressLoginButton = () => {
     redirectToLogin('/(tabs)/account')
   }
+
+  const handleLogout = () => {
+    removeUserInfo()
+  } 
 
   return (
     <View style={styles.container} >
@@ -107,13 +112,28 @@ const Page = () => {
             <TouchableOpacity style={styles.btnChangeAvatar} activeOpacity={0.7}>
               <Ionicons name="ios-camera" size={24} color="black" />
             </TouchableOpacity>
-            <Image style={styles.avatar} source={{uri: 'https://sv5t-api.vhiep.com/uploads/avatar/21-47-9a938e06-841a-4a44-b025-2c86ebe5c297-thatnhucuocsong.png'}} />
+            {
+              // @ts-ignore
+              <Image style={styles.avatar} source={{uri: user?.avatar || 'https://tvusmc.com/assets/img/avt/default.jpg'}} />
+            }
           </View>
-          <Text style={styles.name}>Văn Hiệp</Text>
+          {
+            // @ts-ignore
+            <Text style={styles.name}>{user?.name}</Text>
+          }
           <Text style={styles.description}>Nắm bắt xu thế - Phát triển đam mê</Text>
         </View>
 
-        <View style={{height: 500, backgroundColor: '#fff'}}></View>
+        <View style={{height: 500, backgroundColor: '#fff'}}>
+          {
+            user && 
+            <Button title='Đăng xuất' onPress={handleLogout}/>
+          }
+          {
+            !user &&
+            <Button title='Đăng nhập' onPress={handleOnPressLoginButton}/>
+          }
+        </View>
 
       </Animated.ScrollView>
     </View>

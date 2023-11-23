@@ -3,17 +3,17 @@ import useRedirectLogin from '@/hooks/useRedirectLogin'
 import { useUser } from '@clerk/clerk-expo'
 import { StyleSheet, View } from 'react-native'
 import Spinner from 'react-native-loading-spinner-overlay'
+import { useUserStateContext } from '@/contexts/UserContextProvider'
 
 const Page = () => {
   const { callback } = useRedirectLogin()
-  const { user } = useUser()
+  // const { user } = useUser()
+  const {user} = useUserStateContext()
 
   useEffect(() => {
-    if (user) {
-      console.log(user.lastName);
-      
+    if (user) {      
       callback()
-    }    
+    } 
   }, [user])
 
   return (

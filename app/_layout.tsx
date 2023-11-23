@@ -1,12 +1,12 @@
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
-import * as SecureStore from 'expo-secure-store';
 import { SplashScreen, Stack, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import useRedirectLogin from '@/hooks/useRedirectLogin';
+import { ContextProvider, useUserStateContext } from '@/contexts/UserContextProvider';
 
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
 
@@ -46,22 +46,24 @@ export default function RootLayout() {
   }
 
   return (
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY!}>
-      <RootLayoutNav />
-    </ClerkProvider>
+    <ContextProvider>
+      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY!}>
+        <RootLayoutNav />
+      </ClerkProvider>
+    </ContextProvider>
   )
 }
 
 function RootLayoutNav() {
   const router = useRouter()
   const { redirectToLogin } = useRedirectLogin()
-  const { isLoaded, isSignedIn } = useAuth()
+  const {user, isLoad} = useUserStateContext()
 
-  useEffect(() => {    
-    if (isLoaded && !isSignedIn) {
+  useEffect(() => {  
+    if (isLoad && !user) {
       redirectToLogin('/')
     }
-  }, [isLoaded])
+  }, [isLoad])
 
   return (
     <Stack>
