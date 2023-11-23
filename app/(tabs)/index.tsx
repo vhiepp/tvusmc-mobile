@@ -1,31 +1,42 @@
-import { StyleSheet } from 'react-native';
+import { View, Text } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Stack } from 'expo-router'
+import SearchHeader from '@/components/SearchHeader'
+import { PostList } from '@/components/post'
+import { defaultStyles } from '@/constants/Styles'
+import { axiosClient } from '@/api'
 
-import EditScreenInfo from '../../components/EditScreenInfo';
-import { Text, View } from '../../components/Themed';
+const Page = () => {
+  const [postList, setPostList] = useState([])
+  const [apiPostList, setApiPostList] = useState('blogs/gets')
 
-export default function TabOneScreen() {
+
+  useEffect(() => {
+    try {
+      handleGetPostList()
+    } catch (error) {}
+  }, [])
+
+  const handleGetPostList = async () => {
+    // console.log("get post");
+    if (apiPostList) {
+      const { data } = await axiosClient.post(apiPostList)
+      setApiPostList(data.next_page_url)
+      // @ts-ignore
+      setPostList(prev => [...prev, ...data.data])
+    }
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+    <View style={{ flex: 1, marginTop: defaultStyles.header.height }}>
+      <Stack.Screen 
+        options={{
+          header: () => <SearchHeader />,
+        }}
+      />
+      <PostList postList={postList} isPageEnd={apiPostList === null} isPageFirst={postList.length === 0} onLoadMore={handleGetPostList}/>
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
+export default Page

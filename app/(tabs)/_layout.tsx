@@ -1,55 +1,55 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable, useColorScheme } from 'react-native';
+import { View, Text } from 'react-native'
+import React from 'react'
+import { Tabs } from 'expo-router'
+import Colors from '@/constants/Colors'
+import { Octicons } from '@expo/vector-icons'
 
-import Colors from '../../constants/Colors';
-
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+const Layout = () => {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-      }}>
+    <Tabs screenOptions={{
+      tabBarActiveTintColor: Colors.primary,
+      tabBarLabelStyle: {
+        fontFamily: "mon-sb"
+      },
+      tabBarIconStyle: {
+        fontSize: 1
+      }
+    }}>
+
       <Tabs.Screen
-        name="index"
+        name='index'
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+          tabBarLabel: 'Trang chủ',
+          tabBarIcon: ({ color, size }) => <Octicons name="home" size={size} color={color} />,
         }}
       />
+
       <Tabs.Screen
-        name="two"
+        name='event'
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarLabel: 'Sự kiện',
+          tabBarIcon: ({ color, size }) => <Octicons name="calendar" size={size} color={color} />,
         }}
       />
+
+      <Tabs.Screen
+        name='job'
+        options={{
+          tabBarLabel: 'Công việc',
+          tabBarIcon: ({ color, size }) => <Octicons name="device-camera-video" size={size} color={color} />
+        }}
+      />
+
+      <Tabs.Screen
+        name='account'
+        options={{
+          tabBarLabel: 'Bạn',
+          tabBarIcon: ({ color, size }) => <Octicons name="person" size={size} color={color} />
+        }}
+      />
+
     </Tabs>
-  );
+  )
 }
+
+export default Layout

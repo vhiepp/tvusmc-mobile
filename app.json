@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "tvusmc-mobile",
-    "slug": "tvusmc-mobile",
+    "name": "TVU Social Media Club",
+    "slug": "tvu-social-media-club",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "tvusmc",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -21,8 +21,9 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#001634"
+      },
+      "package": "com.dhiep2307.tvusmcmobile"
     },
     "web": {
       "bundler": "metro",
@@ -30,10 +31,26 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
     ],
     "experiments": {
-      "typedRoutes": true
-    }
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ad3fa749-1ff4-4d01-8f2c-8fc993b2625b"
+      }
+    },
+    "owner": "dhiep9798"
   }
 }
